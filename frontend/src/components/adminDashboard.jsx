@@ -1,0 +1,332 @@
+import { useState, useEffect } from "react";
+import { useSwiggy } from "../context/SwiggyContext";
+const Restaurants = ({ setCurrentMain, setSelectRestaurant }) => {
+  const { restaurants } = useSwiggy();
+  const AddingForm = () => {
+    return (
+      <div className="p-8">
+        <p className="font-extrabold text-2xl mb-6">Create New Restaurant</p>
+
+        {/* Basic Info */}
+        <div className="flex flex-col w-1/2 mx-auto p-6 bg-white shadow-lg rounded-lg mb-6">
+          <p className="font-bold text-lg mb-4">Basic Info</p>
+
+          <div className="flex items-center gap-4 mb-3">
+            <label className="w-40 font-medium">Restaurant Name</label>
+            <input className="border rounded px-3 py-2 flex-1" type="text" />
+          </div>
+
+          <div className="flex items-center gap-4 mb-3">
+            <label className="w-40 font-medium">Owner Name</label>
+            <input className="border rounded px-3 py-2 flex-1" type="text" />
+          </div>
+
+          <div className="flex items-center gap-4 mb-3">
+            <label className="w-40 font-medium">Phone Number</label>
+            <input className="border rounded px-3 py-2 flex-1" type="text" />
+          </div>
+
+          <div className="flex items-center gap-4 mb-3">
+            <label className="w-40 font-medium">Email</label>
+            <input className="border rounded px-3 py-2 flex-1" type="email" />
+          </div>
+        </div>
+
+        {/* Location */}
+        <div className="flex flex-col w-1/2 mx-auto p-6 bg-white shadow-lg rounded-lg mb-6">
+          <p className="font-bold text-lg mb-4">Location</p>
+
+          <div className="flex items-center gap-4 mb-3">
+            <label className="w-40 font-medium">City</label>
+            <input className="border rounded px-3 py-2 flex-1" type="text" />
+          </div>
+
+          <div className="flex items-center gap-4 mb-3">
+            <label className="w-40 font-medium">Pincode</label>
+            <input className="border rounded px-3 py-2 flex-1" type="text" />
+          </div>
+        </div>
+
+        {/* Restaurant Details */}
+        <div className="flex flex-col w-1/2 mx-auto p-6 bg-white shadow-lg rounded-lg mb-6">
+          <p className="font-bold text-lg mb-4">Restaurant Details</p>
+
+          <div className="flex items-center gap-4 mb-3">
+            <label className="w-40 font-medium">Restaurant Type</label>
+            <input className="border rounded px-3 py-2 flex-1" type="text" />
+          </div>
+
+          <div className="flex items-center gap-4 mb-3">
+            <label className="w-40 font-medium">Cuisine Types</label>
+            <input className="border rounded px-3 py-2 flex-1" type="text" />
+          </div>
+
+          <div className="flex items-center gap-4 mb-3">
+            <label className="w-40 font-medium">Opening Hours</label>
+            <input className="border rounded px-3 py-2 flex-1" type="time" />
+          </div>
+
+          <div className="flex items-center gap-4 mb-3">
+            <label className="w-40 font-medium">Closing Hours</label>
+            <input className="border rounded px-3 py-2 flex-1" type="time" />
+          </div>
+        </div>
+
+        {/* Media */}
+        <div className="flex flex-col w-1/2 mx-auto p-6 bg-white shadow-lg rounded-lg">
+          <p className="font-bold text-lg mb-4">Media</p>
+
+          <div className="flex items-center gap-4 mb-3">
+            <label className="w-40 font-medium">Restaurant Logo</label>
+            <input className="border rounded px-3 py-2 flex-1" type="file" />
+          </div>
+
+          <div className="flex items-center gap-4 mb-3">
+            <label className="w-40 font-medium">Cover Photo</label>
+            <input className="border rounded px-3 py-2 flex-1" type="file" />
+          </div>
+        </div>
+      </div>
+    );
+  };
+  return (
+    <div className="p-6 bg-white shadow-md rounded-lg">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-xl font-bold text-gray-800">Your Restaurants</h2>
+        <button
+          className="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition"
+          onClick={() => setCurrentMain(() => AddingForm)}
+        >
+          + Add New Restaurant
+        </button>
+      </div>
+
+      <div className="space-y-2">
+        {restaurants.map((data, index) => (
+          <p
+            key={data._id}
+            className="p-3 border rounded-md bg-gray-50 hover:bg-gray-100 transition"
+            onClick={() => {
+              setSelectRestaurant(data);
+              setCurrentMain(() => Dishes);
+            }}
+          >
+            🍴 {data.name}
+          </p>
+        ))}
+      </div>
+    </div>
+  );
+};
+const Dishes = ({ setCurrentMain, selectedRestaurant }) => {
+  const AddDishForm = () => {
+    return (
+      <div className="p-8">
+        <p className="font-extrabold text-2xl mb-6">Add New Dish</p>
+
+        {/* Dish Info */}
+        <div className="flex flex-col w-1/2 mx-auto p-6 bg-white shadow-lg rounded-lg mb-6">
+          <p className="font-bold text-lg mb-4">Dish Details</p>
+
+          <div className="flex items-center gap-4 mb-3">
+            <label className="w-40 font-medium">Dish Name</label>
+            <input
+              className="border rounded px-3 py-2 flex-1"
+              type="text"
+              placeholder="Enter dish name"
+            />
+          </div>
+
+          <div className="flex items-center gap-4 mb-3">
+            <label className="w-40 font-medium">Category</label>
+            <input
+              className="border rounded px-3 py-2 flex-1"
+              type="text"
+              placeholder="e.g. Starter, Main Course"
+            />
+          </div>
+
+          <div className="flex items-center gap-4 mb-3">
+            <label className="w-40 font-medium">Price</label>
+            <input
+              className="border rounded px-3 py-2 flex-1"
+              type="number"
+              placeholder="₹"
+            />
+          </div>
+
+          <div className="flex items-center gap-4 mb-3">
+            <label className="w-40 font-medium">Description</label>
+            <textarea
+              className="border rounded px-3 py-2 flex-1"
+              rows="2"
+              placeholder="Short description of dish"
+            />
+          </div>
+
+          <div className="flex items-center gap-4 mb-3">
+            <label className="w-40 font-medium">Dish Image</label>
+            <input className="border rounded px-3 py-2 flex-1" type="file" />
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex justify-center gap-6 mt-6">
+          <button className="bg-amber-500 text-white px-6 py-2 rounded-lg font-semibold hover:bg-amber-600 transition">
+            Save Dish
+          </button>
+          <button
+            className="bg-gray-400 text-white px-6 py-2 rounded-lg font-semibold hover:bg-gray-500 transition"
+            onClick={() => setCurrentMain(() => Dishes)}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <>
+      {selectedRestaurant === null ? (
+        <div>
+          <p className="font-extrabold text-2xl mb-6">select restaurant</p>
+          <button
+            className="bg-amber-500 px-4 py-2 rounded-2xl"
+            onClick={() => setCurrentMain(() => Restaurants)}
+          >
+            GO
+          </button>
+        </div>
+      ) : (
+        <div className="p-6 bg-white shadow-md rounded-lg">
+          {/* Restaurant Title */}
+          <p className="font-extrabold text-2xl mb-4 text-gray-800">
+            {selectedRestaurant.name}
+          </p>
+
+          {/* Section Title */}
+          <p className="font-bold text-lg mb-3 text-gray-700">Your Dishes</p>
+
+          {/* Dishes List */}
+          <div className="space-y-3">
+            {selectedRestaurant.dishes.map((dish) => (
+              <div
+                key={dish._id}
+                className="flex justify-between items-center border p-3 rounded-lg hover:bg-gray-50"
+              >
+                <p className="font-medium text-gray-800">{dish.name}</p>
+                <div className="flex gap-3">
+                  <button className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition">
+                    Edit
+                  </button>
+                  <button className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition">
+                    Remove
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Add Dish Button */}
+          <div className="mt-5">
+            <button
+              className="bg-amber-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-amber-600 transition"
+              onClick={() => setCurrentMain(() => AddDishForm)}
+            >
+              + Add New Dish
+            </button>
+          </div>
+        </div>
+      )}
+    </>
+  );
+};
+const Categories = () => {
+  return <div>Categories</div>;
+};
+const Orders = () => {
+  return <div>Orders</div>;
+};
+const Reviews = () => {
+  return <div>Reviews</div>;
+};
+
+const AdminDashboard = () => {
+  const [CurrentMain, setCurrentMain] = useState(() => Restaurants);
+  const [selectedRestaurant, setSelectRestaurant] = useState(null);
+  const [restaurants, setRestaurants] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchRestaurants = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/api/restaurant/all"); // backend URL
+        const data = await res.json();
+        if (data.success) {
+          setRestaurants(data.data);
+        } else {
+          console.error("Failed to fetch restaurants");
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRestaurants();
+  }, []);
+
+  if (loading) return <p>Loading restaurants...</p>;
+  return (
+    <div className="flex">
+      <div className="fixed top-0 left-0 bg-blue-600 text-white w-2/12 h-screen shadow-lg flex flex-col">
+        <h1 className="text-center font-extrabold text-xl py-6 border-b border-blue-400">
+          Admin Panel
+        </h1>
+
+        <nav className="flex-1 mt-4">
+          {[
+            {
+              name: "Restaurants",
+              action: () => setCurrentMain(() => Restaurants),
+            },
+            { name: "Dishes", action: () => setCurrentMain(() => Dishes) },
+            {
+              name: "Categories",
+              action: () => setCurrentMain(() => Categories),
+            },
+            { name: "Orders", action: () => setCurrentMain(() => Orders) },
+            { name: "Reviews", action: () => setCurrentMain(() => Reviews) },
+          ].map((item, index) => (
+            <p
+              key={index}
+              className="ml-6 mr-4 my-2 py-2 px-3 font-semibold rounded-lg cursor-pointer transition-colors duration-200 hover:bg-blue-500 hover:text-amber-300"
+              onClick={item.action}
+            >
+              {item.name}
+            </p>
+          ))}
+        </nav>
+
+        <button
+          onClick={() => alert("logout")}
+          className="m-6 mt-auto py-2 px-4 bg-amber-500 text-blue-900 font-bold rounded-lg hover:bg-amber-400 transition duration-200"
+        >
+          Logout
+        </button>
+      </div>
+
+      <div className="ml-[16.7%] p-6 w-10/12">
+        <CurrentMain
+          setCurrentMain={setCurrentMain}
+          selectedRestaurant={selectedRestaurant}
+          setSelectRestaurant={setSelectRestaurant}
+        />
+      </div>
+    </div>
+  );
+};
+
+export default AdminDashboard;

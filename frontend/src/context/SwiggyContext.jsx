@@ -1,37 +1,44 @@
 import { createContext, useContext, useEffect, useState } from "react";
 const swiggyContext = createContext();
 export const SwiggyProvider = ({ children }) => {
-  const [swiggyData, setSwiggyData] = useState(() => {
-    try {
-      const savedCart = localStorage.getItem("DATA_STORAGE_KEY");
-      return savedCart ? JSON.parse(savedCart) : [];
-    } catch (error) {
-      return {}; // Return empty array on error
-    }
-  });
-  const [restarantData, setRestarantData] = useState(null);
   const [cartItems, setCartItems] = useState([]);
   const [user, setUser] = useState("default");
-  useEffect(() => {
-    localStorage.setItem("DATA_STORAGE_KEY", JSON.stringify(swiggyData));
-  }, [swiggyData]);
+
+  const [restaurants, setRestaurants] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    localStorage.setItem("CART_STORAGE_KEY", JSON.stringify(cartItems));
-    console.log(cartItems);
-  }, [cartItems]);
+    const fetchRestaurants = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/api/restaurant/all"); // backend URL
+        const data = await res.json();
+        if (data.success) {
+          setRestaurants(data.data);
+        } else {
+          console.error("Failed to fetch restaurants");
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
+    fetchRestaurants();
+  }, []);
+
+  if (loading) return <p>Loading restaurants...</p>;
   return (
     <swiggyContext.Provider
       value={{
-        swiggyData,
-        setSwiggyData,
         cartItems,
         setCartItems,
         user,
         setUser,
-        restarantData,
-        setRestarantData,
+        restaurants,
+        setRestaurants,
+        loading,
+        setLoading,
       }}
     >
       {children}
