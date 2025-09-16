@@ -1,8 +1,56 @@
 import { useState, useEffect } from "react";
 import { useSwiggy } from "../context/SwiggyContext";
 const Restaurants = ({ setCurrentMain, setSelectRestaurant }) => {
-  const { restaurants } = useSwiggy();
+  const { restaurants, setRestaurants } = useSwiggy();
   const AddingForm = () => {
+    //basic info
+    const [restaurantName, setRestaurantName] = useState("");
+    const [ownerName, setOwnerName] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState("");
+    const [email, setEmail] = useState("");
+    //location
+    const [city, setCity] = useState("");
+    const [pincode, setPincode] = useState("");
+    //details
+    const [restaurantType, setRestaurantType] = useState("");
+    const [openingHours, setOpeningHours] = useState("");
+    const [closingHours, setClosingHours] = useState("");
+    //media
+    const [logo, setLogo] = useState(null);
+    const [coverPhoto, setCoverPhoto] = useState(null);
+    const saveRestaurant = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:5000/api/restaurant/create",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name: restaurantName,
+              ownerName,
+              phoneNumber,
+              email,
+              location: { city, pincode },
+              restaurantType,
+              openingHours,
+              closingHours,
+              media: { logo, coverPhoto },
+            }),
+          }
+        );
+        const data = await response.json();
+        console.log(data);
+        if (data.success) {
+          alert("restaurant created successfully");
+          setRestaurants((prev) => [...prev, data.data]);
+          setCurrentMain(() => Restaurants);
+        } else {
+          alert("failed to create restaurant");
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    };
     return (
       <div className="p-8">
         <p className="font-extrabold text-2xl mb-6">Create New Restaurant</p>
@@ -13,22 +61,50 @@ const Restaurants = ({ setCurrentMain, setSelectRestaurant }) => {
 
           <div className="flex items-center gap-4 mb-3">
             <label className="w-40 font-medium">Restaurant Name</label>
-            <input className="border rounded px-3 py-2 flex-1" type="text" />
+            <input
+              className="border rounded px-3 py-2 flex-1"
+              type="text"
+              value={restaurantName}
+              onChange={(e) => {
+                setRestaurantName(e.target.value);
+              }}
+            />
           </div>
 
           <div className="flex items-center gap-4 mb-3">
             <label className="w-40 font-medium">Owner Name</label>
-            <input className="border rounded px-3 py-2 flex-1" type="text" />
+            <input
+              className="border rounded px-3 py-2 flex-1"
+              type="text"
+              value={ownerName}
+              onChange={(e) => {
+                setOwnerName(e.target.value);
+              }}
+            />
           </div>
 
           <div className="flex items-center gap-4 mb-3">
             <label className="w-40 font-medium">Phone Number</label>
-            <input className="border rounded px-3 py-2 flex-1" type="text" />
+            <input
+              className="border rounded px-3 py-2 flex-1"
+              type="text"
+              value={phoneNumber}
+              onChange={(e) => {
+                setPhoneNumber(e.target.value);
+              }}
+            />
           </div>
 
           <div className="flex items-center gap-4 mb-3">
             <label className="w-40 font-medium">Email</label>
-            <input className="border rounded px-3 py-2 flex-1" type="email" />
+            <input
+              className="border rounded px-3 py-2 flex-1"
+              type="email"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+              }}
+            />
           </div>
         </div>
 
@@ -38,12 +114,26 @@ const Restaurants = ({ setCurrentMain, setSelectRestaurant }) => {
 
           <div className="flex items-center gap-4 mb-3">
             <label className="w-40 font-medium">City</label>
-            <input className="border rounded px-3 py-2 flex-1" type="text" />
+            <input
+              className="border rounded px-3 py-2 flex-1"
+              type="text"
+              value={city}
+              onChange={(e) => {
+                setCity(e.target.value);
+              }}
+            />
           </div>
 
           <div className="flex items-center gap-4 mb-3">
             <label className="w-40 font-medium">Pincode</label>
-            <input className="border rounded px-3 py-2 flex-1" type="text" />
+            <input
+              className="border rounded px-3 py-2 flex-1"
+              type="text"
+              value={pincode}
+              onChange={(e) => {
+                setPincode(e.target.value);
+              }}
+            />
           </div>
         </div>
 
@@ -53,22 +143,38 @@ const Restaurants = ({ setCurrentMain, setSelectRestaurant }) => {
 
           <div className="flex items-center gap-4 mb-3">
             <label className="w-40 font-medium">Restaurant Type</label>
-            <input className="border rounded px-3 py-2 flex-1" type="text" />
-          </div>
-
-          <div className="flex items-center gap-4 mb-3">
-            <label className="w-40 font-medium">Cuisine Types</label>
-            <input className="border rounded px-3 py-2 flex-1" type="text" />
+            <input
+              className="border rounded px-3 py-2 flex-1"
+              type="text"
+              value={restaurantType}
+              onChange={(e) => {
+                setRestaurantType(e.target.value);
+              }}
+            />
           </div>
 
           <div className="flex items-center gap-4 mb-3">
             <label className="w-40 font-medium">Opening Hours</label>
-            <input className="border rounded px-3 py-2 flex-1" type="time" />
+            <input
+              className="border rounded px-3 py-2 flex-1"
+              type="time"
+              value={openingHours}
+              onChange={(e) => {
+                setOpeningHours(e.target.value);
+              }}
+            />
           </div>
 
           <div className="flex items-center gap-4 mb-3">
             <label className="w-40 font-medium">Closing Hours</label>
-            <input className="border rounded px-3 py-2 flex-1" type="time" />
+            <input
+              className="border rounded px-3 py-2 flex-1"
+              type="time"
+              value={closingHours}
+              onChange={(e) => {
+                setClosingHours(e.target.value);
+              }}
+            />
           </div>
         </div>
 
@@ -78,13 +184,42 @@ const Restaurants = ({ setCurrentMain, setSelectRestaurant }) => {
 
           <div className="flex items-center gap-4 mb-3">
             <label className="w-40 font-medium">Restaurant Logo</label>
-            <input className="border rounded px-3 py-2 flex-1" type="file" />
+            <input
+              className="border rounded px-3 py-2 flex-1"
+              type="file"
+              onChange={(e) => {
+                setLogo(e.target.files[0]);
+              }}
+            />
           </div>
 
           <div className="flex items-center gap-4 mb-3">
             <label className="w-40 font-medium">Cover Photo</label>
-            <input className="border rounded px-3 py-2 flex-1" type="file" />
+            <input
+              className="border rounded px-3 py-2 flex-1"
+              type="file"
+              onChange={(e) => {
+                setCoverPhoto(e.target.files[0]);
+              }}
+            />
           </div>
+        </div>
+        {/* Action Buttons */}
+        <div className="flex justify-center gap-6 mt-6">
+          <button
+            className="bg-amber-500 text-white px-6 py-2 rounded-lg font-semibold hover:bg-amber-600 transition"
+            onClick={() => {
+              saveRestaurant();
+            }}
+          >
+            Save Restaurant
+          </button>
+          <button
+            className="bg-gray-400 text-white px-6 py-2 rounded-lg font-semibold hover:bg-gray-500 transition"
+            onClick={() => setCurrentMain(() => Restaurants)}
+          >
+            Cancel
+          </button>
         </div>
       </div>
     );
@@ -118,8 +253,46 @@ const Restaurants = ({ setCurrentMain, setSelectRestaurant }) => {
     </div>
   );
 };
-const Dishes = ({ setCurrentMain, selectedRestaurant }) => {
+const Dishes = ({
+  setCurrentMain,
+  selectedRestaurant,
+  setSelectRestaurant,
+}) => {
   const AddDishForm = () => {
+    const [dishName, setDishName] = useState("");
+    const [category, setCategory] = useState("");
+    const [price, setPrice] = useState("");
+    const [description, setDescription] = useState("");
+    const [image, setImage] = useState(null);
+    const saveDish = async () => {
+      if (!dishName || !price) {
+        alert("Dish name and price are required");
+        return;
+      }
+      const response = await fetch(
+        `http://localhost:5000/api/restaurant/${selectedRestaurant._id}/addDish`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: dishName,
+            price: Number(price),
+            description,
+            category,
+            image,
+          }),
+        }
+      );
+      const data = await response.json();
+      console.log(data);
+      if (data.success) {
+        alert("Dish added successfully");
+        selectedRestaurant.dishes.push(data.data.dishes.slice(-1)[0]);
+        setCurrentMain(() => Dishes);
+      } else {
+        alert("Failed to add dish");
+      }
+    };
     return (
       <div className="p-8">
         <p className="font-extrabold text-2xl mb-6">Add New Dish</p>
@@ -134,6 +307,8 @@ const Dishes = ({ setCurrentMain, selectedRestaurant }) => {
               className="border rounded px-3 py-2 flex-1"
               type="text"
               placeholder="Enter dish name"
+              value={dishName}
+              onChange={(e) => setDishName(e.target.value)}
             />
           </div>
 
@@ -143,6 +318,8 @@ const Dishes = ({ setCurrentMain, selectedRestaurant }) => {
               className="border rounded px-3 py-2 flex-1"
               type="text"
               placeholder="e.g. Starter, Main Course"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
             />
           </div>
 
@@ -152,6 +329,8 @@ const Dishes = ({ setCurrentMain, selectedRestaurant }) => {
               className="border rounded px-3 py-2 flex-1"
               type="number"
               placeholder="₹"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
             />
           </div>
 
@@ -161,18 +340,29 @@ const Dishes = ({ setCurrentMain, selectedRestaurant }) => {
               className="border rounded px-3 py-2 flex-1"
               rows="2"
               placeholder="Short description of dish"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
             />
           </div>
 
           <div className="flex items-center gap-4 mb-3">
             <label className="w-40 font-medium">Dish Image</label>
-            <input className="border rounded px-3 py-2 flex-1" type="file" />
+            <input
+              className="border rounded px-3 py-2 flex-1"
+              type="file"
+              onChange={(e) => setImage(e.target.files[0])}
+            />
           </div>
         </div>
 
         {/* Action Buttons */}
         <div className="flex justify-center gap-6 mt-6">
-          <button className="bg-amber-500 text-white px-6 py-2 rounded-lg font-semibold hover:bg-amber-600 transition">
+          <button
+            className="bg-amber-500 text-white px-6 py-2 rounded-lg font-semibold hover:bg-amber-600 transition"
+            onClick={() => {
+              saveDish();
+            }}
+          >
             Save Dish
           </button>
           <button
@@ -184,6 +374,48 @@ const Dishes = ({ setCurrentMain, selectedRestaurant }) => {
         </div>
       </div>
     );
+  };
+
+  const [kebab, setKebab] = useState(false);
+  const { setRestaurants } = useSwiggy();
+  const removeRestaurant = async () => {
+    if (confirm(`Do you want remove ${selectedRestaurant.name} `)) {
+      await fetch(
+        `http://localhost:5000/api/restaurant/restaurants/${selectedRestaurant._id}`,
+        {
+          method: "DELETE",
+        }
+      )
+        .then((res) => res.json())
+        .then((data) => alert(data.message))
+        .then(
+          setRestaurants((prev) =>
+            prev.filter((f) => f._id !== selectedRestaurant._id)
+          )
+        )
+        .then(setCurrentMain(() => Restaurants));
+    }
+  };
+  const removeDish = async (restaurantId, dishId) => {
+    if (confirm("Are you sure you want to remove this dish?")) {
+      const res = await fetch(
+        `http://localhost:5000/api/restaurant/restaurants/${restaurantId}/dishes/${dishId}`,
+        { method: "DELETE" }
+      );
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert(data.message);
+        // update local state (remove dish)
+        setSelectRestaurant((prev) => ({
+          ...prev,
+          dishes: prev.dishes.filter((f) => f._id !== dishId),
+        }));
+      } else {
+        alert("Error deleting dish");
+      }
+    }
   };
 
   return (
@@ -201,9 +433,29 @@ const Dishes = ({ setCurrentMain, selectedRestaurant }) => {
       ) : (
         <div className="p-6 bg-white shadow-md rounded-lg">
           {/* Restaurant Title */}
-          <p className="font-extrabold text-2xl mb-4 text-gray-800">
-            {selectedRestaurant.name}
-          </p>
+          <div className="flex justify-between items-center mb-6">
+            <span className="font-extrabold text-2xl mb-4 text-gray-800">
+              {selectedRestaurant.name}
+            </span>
+            <div className="relative">
+              <span
+                className="font-extrabold cursor-pointer p-4"
+                onClick={() => setKebab(!kebab)}
+              >
+                ⋮
+              </span>
+              {kebab && (
+                <div className="absolute right-0  mt-2 w-48 bg-white border rounded-lg shadow-lg z-10">
+                  <button
+                    onClick={() => removeRestaurant()}
+                    className="block w-full text-left px-4 py-2 text-sm text-orange-600 hover:bg-gray-100 rounded-lg"
+                  >
+                    Remove Restaurant
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
 
           {/* Section Title */}
           <p className="font-bold text-lg mb-3 text-gray-700">Your Dishes</p>
@@ -220,7 +472,10 @@ const Dishes = ({ setCurrentMain, selectedRestaurant }) => {
                   <button className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition">
                     Edit
                   </button>
-                  <button className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition">
+                  <button
+                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"
+                    onClick={() => removeDish(selectedRestaurant._id, dish._id)}
+                  >
                     Remove
                   </button>
                 </div>

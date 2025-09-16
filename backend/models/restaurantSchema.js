@@ -44,10 +44,8 @@ const restaurantSchema = new mongoose.Schema({
   },
   restaurantType: {
     type: String,
-    enum: ["Dine-in", "Takeaway", "Delivery", "Cafe", "Bakery", "Other"],
     required: true,
   },
-  cuisines: [{ type: String, trim: true }],
   openingHours: { type: String, required: true },
   closingHours: { type: String, required: true },
   media: {

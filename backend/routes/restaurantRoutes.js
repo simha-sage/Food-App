@@ -48,7 +48,7 @@ router.post("/create", async (req, res) => {
   }
 });
 
-router.post("/:restaurantId/add-dish", async (req, res) => {
+router.post("/:restaurantId/addDish", async (req, res) => {
   try {
     const { restaurantId } = req.params;
     const { name, price, description, category, isAvailable, image } = req.body;
@@ -106,6 +106,45 @@ router.get("/all", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: "Server Error", error });
+  }
+});
+
+router.delete("/restaurants/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleted = await Restaurant.findByIdAndDelete(id);
+
+    if (!deleted) {
+      return res.status(404).json({ message: "Restaurant not found" });
+    }
+
+    res.json({ message: "Restaurant deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting restaurant", error });
+  }
+});
+
+// DELETE /restaurants/:restaurantId/dishes/:dishId
+router.delete("/restaurants/:restaurantId/dishes/:dishId", async (req, res) => {
+  try {
+    const { restaurantId, dishId } = req.params;
+
+    const updatedRestaurant = await Restaurant.findByIdAndUpdate(
+      restaurantId,
+      { $pull: { dishes: { _id: dishId } } }, // remove dish
+      { new: true } // return updated restaurant
+    );
+
+    if (!updatedRestaurant) {
+      return res.status(404).json({ message: "Restaurant not found" });
+    }
+
+    res.json({
+      message: "Dish removed successfully",
+      restaurant: updatedRestaurant,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting dish", error });
   }
 });
 
