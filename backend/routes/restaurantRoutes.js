@@ -54,40 +54,52 @@ router.post("/:restaurantId/addDish", async (req, res) => {
     const { name, price, description, category, isAvailable, image } = req.body;
 
     // Validate required fields
-    if (!name || !price) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Name and price are required" });
+    if (!name || !price || !category) {
+      return res.status(400).json({
+        success: false,
+        message: "Name, price, and category are required",
+      });
     }
 
-    // Push new dish into restaurant's dishes array
-    const updatedRestaurant = await Restaurant.findByIdAndUpdate(
-      restaurantId,
-      {
-        $push: {
-          dishes: {
-            name,
-            price,
-            description,
-            category,
-            isAvailable: isAvailable ?? true,
-            image,
-          },
-        },
-      },
-      { new: true } // return updated document
-    );
-
-    if (!updatedRestaurant) {
+    // Step 1: Find the restaurant
+    const restaurant = await Restaurant.findById(restaurantId);
+    if (!restaurant) {
       return res
         .status(404)
         .json({ success: false, message: "Restaurant not found" });
     }
 
+    // Step 2: Check if category already exists
+    let categoryObj = restaurant.categories.find(
+      (cat) => cat.title.toLowerCase() === category.toLowerCase()
+    );
+
+    // Step 3: If category doesn’t exist, create it
+    if (!categoryObj) {
+      // Create a new subdocument using Mongoose model
+      categoryObj = restaurant.categories.create({
+        title: category,
+        dishes: [],
+      });
+      restaurant.categories.push(categoryObj);
+    }
+
+    // Now push dish normally
+    categoryObj.dishes.push({
+      name,
+      price,
+      description,
+      isAvailable: isAvailable ?? true,
+      image,
+    });
+
+    // Step 5: Save changes
+    await restaurant.save();
+
     res.status(200).json({
       success: true,
-      message: "Dish added successfully",
-      data: updatedRestaurant,
+      message: `Dish added successfully under ${category}`,
+      data: restaurant,
     });
   } catch (error) {
     console.error(error);
@@ -125,27 +137,32 @@ router.delete("/restaurants/:id", async (req, res) => {
 });
 
 // DELETE /restaurants/:restaurantId/dishes/:dishId
-router.delete("/restaurants/:restaurantId/dishes/:dishId", async (req, res) => {
-  try {
-    const { restaurantId, dishId } = req.params;
+router.delete(
+  "/restaurants/:restaurantId/:categoryId/:dishId",
+  async (req, res) => {
+    try {
+      const { restaurantId, categoryId, dishId } = req.params;
 
-    const updatedRestaurant = await Restaurant.findByIdAndUpdate(
-      restaurantId,
-      { $pull: { dishes: { _id: dishId } } }, // remove dish
-      { new: true } // return updated restaurant
-    );
+      const updatedRestaurant = await Restaurant.findOneAndUpdate(
+        { _id: restaurantId, "categories._id": categoryId },
+        { $pull: { "categories.$.dishes": { _id: dishId } } },
+        { new: true }
+      );
 
-    if (!updatedRestaurant) {
-      return res.status(404).json({ message: "Restaurant not found" });
+      if (!updatedRestaurant) {
+        return res
+          .status(404)
+          .json({ message: "Restaurant or category not found" });
+      }
+
+      res.json({
+        message: "Dish removed successfully",
+        restaurant: updatedRestaurant,
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Error deleting dish", error });
     }
-
-    res.json({
-      message: "Dish removed successfully",
-      restaurant: updatedRestaurant,
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Error deleting dish", error });
   }
-});
+);
 
 export default router;

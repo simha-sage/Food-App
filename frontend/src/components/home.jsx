@@ -1,32 +1,41 @@
 import Card from "./card";
-import Banners from "./banners";
 import Notice from "./notice";
 import Footer from "./footer";
 import Navigation from "./navigation";
 import { useSwiggy } from "../context/SwiggyContext";
+import { useState } from "react";
+import RestarantDishes from "./restaurantDishes";
 
-const Cards = () => {
-  const { swiggyData } = useSwiggy();
+const RestaCards = ({ setCurrentMain, setSelectRestaurant }) => {
+  const { restaurants } = useSwiggy();
 
   return (
     <div className="flex flex-wrap justify-around">
-      {swiggyData?.data?.cards?.[1]?.card?.card?.gridElements?.infoWithStyle?.restaurants?.map(
-        (item, i) => (
-          <Card key={i} item={item} />
-        )
-      )}
+      {restaurants.map((item, i) => (
+        <Card
+          key={i}
+          item={item}
+          setSelectRestaurant={setSelectRestaurant}
+          setCurrentMain={setCurrentMain}
+        />
+      ))}
     </div>
   );
 };
 
 const Home = () => {
+  const [CurrentMain, setCurrentMain] = useState(() => RestaCards);
+  const [selectedRestaurant, setSelectRestaurant] = useState(null);
   return (
     <>
       <Notice />
       <Navigation />
-      <Banners />
 
-      <Cards />
+      <CurrentMain
+        setCurrentMain={setCurrentMain}
+        setSelectRestaurant={setSelectRestaurant}
+        selectedRestaurant={selectedRestaurant}
+      />
 
       <Footer />
     </>

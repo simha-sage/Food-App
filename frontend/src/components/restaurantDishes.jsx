@@ -1,17 +1,11 @@
 import { useState } from "react";
 import { useSwiggy } from "../context/SwiggyContext";
-const RestarantCard = () => {
-  const { restarantData } = useSwiggy();
-  if (!restarantData) {
-    return <h1>loading...</h1>;
-  }
+const RestarantDishes = ({ selectedRestaurant }) => {
   return (
     <div>
-      {restarantData?.data?.cards?.[4]?.groupedCard?.cardGroupMap?.REGULAR?.cards?.map(
-        (item, i) => (
-          <Title key={i} item={item} />
-        )
-      )}
+      {selectedRestaurant.categories.map((item, i) => (
+        <Title key={i} item={item} />
+      ))}
     </div>
   );
 };
@@ -19,7 +13,7 @@ const RestaCard = ({ item }) => {
   const { cartItems, setCartItems } = useSwiggy();
   return (
     <div className=" flex justify-between px-3 py-1">
-      <h1 className="">{item.card.info.name}</h1>
+      <h1 className="">{item.name}</h1>
       <button
         className="bg-green-300 rounded px-1"
         onClick={() => {
@@ -41,14 +35,12 @@ const Title = ({ item }) => {
         }}
         className="text-blue-800 font-bold text-center bg-amber-300"
       >
-        {item?.card?.card?.title}
+        {item.title}
       </h1>
       {display
-        ? item?.card?.card?.itemCards?.map((itemInCatagory, i) => (
-            <RestaCard key={i} item={itemInCatagory} />
-          ))
+        ? item.dishes.map((dish) => <RestaCard key={dish._id} item={dish} />)
         : null}
     </div>
   );
 };
-export default RestarantCard;
+export default RestarantDishes;

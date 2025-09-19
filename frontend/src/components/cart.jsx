@@ -22,12 +22,12 @@ const RestaCard = ({ item }) => {
   const { cartItems, setCartItems } = useSwiggy();
   const removeItemInCart = () => {
     setCartItems((cartItems) =>
-      cartItems.filter((element) => element.card.info.id !== item.card.info.id)
+      cartItems.filter((element) => element._id !== item._id)
     );
   };
   return (
     <div className=" flex justify-between px-3 py-1">
-      <h1 className="">{item.card.info.name}</h1>
+      <h1 className="">{item.name}</h1>
       <button onClick={removeItemInCart}>X</button>
     </div>
   );

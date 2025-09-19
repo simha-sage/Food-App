@@ -284,10 +284,11 @@ const Dishes = ({
         }
       );
       const data = await response.json();
-      console.log(data);
+
       if (data.success) {
         alert("Dish added successfully");
-        selectedRestaurant.dishes.push(data.data.dishes.slice(-1)[0]);
+        setSelectRestaurant(data.data);
+        console.log(data);
         setCurrentMain(() => Dishes);
       } else {
         alert("Failed to add dish");
@@ -396,10 +397,10 @@ const Dishes = ({
         .then(setCurrentMain(() => Restaurants));
     }
   };
-  const removeDish = async (restaurantId, dishId) => {
+  const removeDish = async (restaurantId, categoryId, dishId) => {
     if (confirm("Are you sure you want to remove this dish?")) {
       const res = await fetch(
-        `http://localhost:5000/api/restaurant/restaurants/${restaurantId}/dishes/${dishId}`,
+        `http://localhost:5000/api/restaurant/restaurants/${restaurantId}/${categoryId}/${dishId}`,
         { method: "DELETE" }
       );
 
@@ -410,7 +411,10 @@ const Dishes = ({
         // update local state (remove dish)
         setSelectRestaurant((prev) => ({
           ...prev,
-          dishes: prev.dishes.filter((f) => f._id !== dishId),
+          categories: prev.categories.map((category) => ({
+            ...category,
+            dishes: category.dishes.filter((f) => f._id !== dishId),
+          })),
         }));
       } else {
         alert("Error deleting dish");
@@ -462,23 +466,33 @@ const Dishes = ({
 
           {/* Dishes List */}
           <div className="space-y-3">
-            {selectedRestaurant.dishes.map((dish) => (
-              <div
-                key={dish._id}
-                className="flex justify-between items-center border p-3 rounded-lg hover:bg-gray-50"
-              >
-                <p className="font-medium text-gray-800">{dish.name}</p>
-                <div className="flex gap-3">
-                  <button className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition">
-                    Edit
-                  </button>
-                  <button
-                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"
-                    onClick={() => removeDish(selectedRestaurant._id, dish._id)}
+            {selectedRestaurant.categories.map((category) => (
+              <div key={category.title}>
+                {category.dishes.map((dish) => (
+                  <div
+                    key={dish._id}
+                    className="flex justify-between items-center border p-3 rounded-lg hover:bg-gray-50"
                   >
-                    Remove
-                  </button>
-                </div>
+                    <p className="font-medium text-gray-800">{dish.name}</p>
+                    <div className="flex gap-3">
+                      <button className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition">
+                        Edit
+                      </button>
+                      <button
+                        className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"
+                        onClick={() =>
+                          removeDish(
+                            selectedRestaurant._id,
+                            category._id,
+                            dish._id
+                          )
+                        }
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
             ))}
           </div>
@@ -497,8 +511,40 @@ const Dishes = ({
     </>
   );
 };
-const Categories = () => {
-  return <div>Categories</div>;
+const Categories = ({ selectedRestaurant }) => {
+  return (
+    <div>
+      <div className="space-y-3">
+        {selectedRestaurant.categories.map((category) => (
+          <div key={category.title}>
+            <h2 className="font-bold text-lg mb-2">{category.title}</h2>
+
+            {category.dishes.map((dish) => (
+              <div
+                key={dish._id}
+                className="flex justify-between items-center border p-3 rounded-lg hover:bg-gray-50"
+              >
+                <p className="font-medium text-gray-800">{dish.name}</p>
+                <div className="flex gap-3">
+                  <button className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition">
+                    Edit
+                  </button>
+                  <button
+                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"
+                    onClick={() =>
+                      removeDish(selectedRestaurant._id, category._id, dish._id)
+                    }
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 };
 const Orders = () => {
   return <div>Orders</div>;

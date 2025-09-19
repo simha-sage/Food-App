@@ -15,10 +15,6 @@ const dishSchema = new mongoose.Schema({
     type: String,
     trim: true,
   },
-  category: {
-    type: String, // Example: "Starter", "Main Course", "Dessert"
-    trim: true,
-  },
   isAvailable: {
     type: Boolean,
     default: true,
@@ -27,7 +23,10 @@ const dishSchema = new mongoose.Schema({
     type: String, // URL or path
   },
 });
-
+const categorySchema = new mongoose.Schema({
+  title: { type: String, required: true, trim: true }, // Example: "Starter", "Tiffin"
+  dishes: [dishSchema], // array of dishes under that category
+});
 const restaurantSchema = new mongoose.Schema({
   name: { type: String, required: true, trim: true },
   ownerName: { type: String, required: true, trim: true },
@@ -52,7 +51,7 @@ const restaurantSchema = new mongoose.Schema({
     logo: { type: String },
     coverPhoto: { type: String },
   },
-  dishes: [dishSchema], // <-- empty array by default
+  categories: [categorySchema], // <-- empty array by default
   createdAt: { type: Date, default: Date.now },
 });
 
