@@ -10,7 +10,7 @@ const RestaCards = ({ setCurrentMain, setSelectRestaurant }) => {
   const { restaurants } = useSwiggy();
 
   return (
-    <div className="flex flex-wrap justify-around">
+    <div className="flex flex-wrap justify-start">
       {restaurants.map((item, i) => (
         <Card
           key={i}
@@ -28,16 +28,18 @@ const Home = () => {
   const [selectedRestaurant, setSelectRestaurant] = useState(null);
   return (
     <>
-      <Notice />
-      <Navigation />
+      <div className="relative min-h-screen flex flex-col ">
+        <Notice />
+        <Navigation />
 
-      <CurrentMain
-        setCurrentMain={setCurrentMain}
-        setSelectRestaurant={setSelectRestaurant}
-        selectedRestaurant={selectedRestaurant}
-      />
+        <CurrentMain
+          setCurrentMain={setCurrentMain}
+          setSelectRestaurant={setSelectRestaurant}
+          selectedRestaurant={selectedRestaurant}
+        />
 
-      <Footer />
+        <Footer />
+      </div>
     </>
   );
 };

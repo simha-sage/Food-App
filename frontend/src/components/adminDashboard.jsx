@@ -20,6 +20,26 @@ const Restaurants = ({ setCurrentMain, setSelectRestaurant }) => {
     const [coverPhoto, setCoverPhoto] = useState(null);
     const saveRestaurant = async () => {
       try {
+        const uploadToClodinary = async (file) => {
+          const mediaData = new FormData();
+          mediaData.append("file", file);
+          mediaData.append("upload_preset", "resraurant");
+          mediaData.append("cloud_name", "dwmatbjdw");
+          const res = await fetch(
+            "https://api.cloudinary.com/v1_1/dwmatbjdw/image/upload",
+            {
+              method: "POST",
+              body: mediaData,
+            }
+          );
+          const data = await res.json();
+          return data.secure_url;
+        };
+        const [logoUrl, coverPhotoUrl] = await Promise.all([
+          uploadToClodinary(logo),
+          uploadToClodinary(coverPhoto),
+        ]);
+
         const response = await fetch(
           "http://localhost:5000/api/restaurant/create",
           {
@@ -34,12 +54,14 @@ const Restaurants = ({ setCurrentMain, setSelectRestaurant }) => {
               restaurantType,
               openingHours,
               closingHours,
-              media: { logo, coverPhoto },
+              media: {
+                logo: logoUrl,
+                coverPhoto: coverPhotoUrl,
+              },
             }),
           }
         );
         const data = await response.json();
-        console.log(data);
         if (data.success) {
           alert("restaurant created successfully");
           setRestaurants((prev) => [...prev, data.data]);
@@ -48,179 +70,195 @@ const Restaurants = ({ setCurrentMain, setSelectRestaurant }) => {
           alert("failed to create restaurant");
         }
       } catch (err) {
-        console.log(err);
+        console.error(err);
       }
     };
     return (
       <div className="p-8">
         <p className="font-extrabold text-2xl mb-6">Create New Restaurant</p>
 
-        {/* Basic Info */}
-        <div className="flex flex-col w-1/2 mx-auto p-6 bg-white shadow-lg rounded-lg mb-6">
-          <p className="font-bold text-lg mb-4">Basic Info</p>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            saveRestaurant();
+          }}
+        >
+          {/* Basic Info */}
+          <div className="flex flex-col w-1/2 mx-auto p-6 bg-white shadow-lg rounded-lg mb-6">
+            <p className="font-bold text-lg mb-4">Basic Info</p>
 
-          <div className="flex items-center gap-4 mb-3">
-            <label className="w-40 font-medium">Restaurant Name</label>
-            <input
-              className="border rounded px-3 py-2 flex-1"
-              type="text"
-              value={restaurantName}
-              onChange={(e) => {
-                setRestaurantName(e.target.value);
-              }}
-            />
+            <div className="flex items-center gap-4 mb-3">
+              <label className="w-40 font-medium">Restaurant Name</label>
+              <input
+                className="border rounded px-3 py-2 flex-1"
+                type="text"
+                value={restaurantName}
+                required
+                onChange={(e) => {
+                  setRestaurantName(e.target.value);
+                }}
+              />
+            </div>
+
+            <div className="flex items-center gap-4 mb-3">
+              <label className="w-40 font-medium">Owner Name</label>
+              <input
+                className="border rounded px-3 py-2 flex-1"
+                type="text"
+                value={ownerName}
+                required
+                onChange={(e) => {
+                  setOwnerName(e.target.value);
+                }}
+              />
+            </div>
+
+            <div className="flex items-center gap-4 mb-3">
+              <label className="w-40 font-medium">Phone Number</label>
+              <input
+                className="border rounded px-3 py-2 flex-1"
+                type="text"
+                value={phoneNumber}
+                required
+                onChange={(e) => {
+                  setPhoneNumber(e.target.value);
+                }}
+              />
+            </div>
+
+            <div className="flex items-center gap-4 mb-3">
+              <label className="w-40 font-medium">Email</label>
+              <input
+                className="border rounded px-3 py-2 flex-1"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                }}
+              />
+            </div>
           </div>
 
-          <div className="flex items-center gap-4 mb-3">
-            <label className="w-40 font-medium">Owner Name</label>
-            <input
-              className="border rounded px-3 py-2 flex-1"
-              type="text"
-              value={ownerName}
-              onChange={(e) => {
-                setOwnerName(e.target.value);
-              }}
-            />
+          {/* Location */}
+          <div className="flex flex-col w-1/2 mx-auto p-6 bg-white shadow-lg rounded-lg mb-6">
+            <p className="font-bold text-lg mb-4">Location</p>
+
+            <div className="flex items-center gap-4 mb-3">
+              <label className="w-40 font-medium">City</label>
+              <input
+                className="border rounded px-3 py-2 flex-1"
+                type="text"
+                value={city}
+                required
+                onChange={(e) => {
+                  setCity(e.target.value);
+                }}
+              />
+            </div>
+
+            <div className="flex items-center gap-4 mb-3">
+              <label className="w-40 font-medium">Pincode</label>
+              <input
+                className="border rounded px-3 py-2 flex-1"
+                type="text"
+                value={pincode}
+                required
+                onChange={(e) => {
+                  setPincode(e.target.value);
+                }}
+              />
+            </div>
           </div>
 
-          <div className="flex items-center gap-4 mb-3">
-            <label className="w-40 font-medium">Phone Number</label>
-            <input
-              className="border rounded px-3 py-2 flex-1"
-              type="text"
-              value={phoneNumber}
-              onChange={(e) => {
-                setPhoneNumber(e.target.value);
-              }}
-            />
+          {/* Restaurant Details */}
+          <div className="flex flex-col w-1/2 mx-auto p-6 bg-white shadow-lg rounded-lg mb-6">
+            <p className="font-bold text-lg mb-4">Restaurant Details</p>
+
+            <div className="flex items-center gap-4 mb-3">
+              <label className="w-40 font-medium">Restaurant Type</label>
+              <input
+                className="border rounded px-3 py-2 flex-1"
+                type="text"
+                value={restaurantType}
+                required
+                onChange={(e) => {
+                  setRestaurantType(e.target.value);
+                }}
+              />
+            </div>
+
+            <div className="flex items-center gap-4 mb-3">
+              <label className="w-40 font-medium">Opening Hours</label>
+              <input
+                className="border rounded px-3 py-2 flex-1"
+                type="time"
+                required
+                value={openingHours}
+                onChange={(e) => {
+                  setOpeningHours(e.target.value);
+                }}
+              />
+            </div>
+
+            <div className="flex items-center gap-4 mb-3">
+              <label className="w-40 font-medium">Closing Hours</label>
+              <input
+                className="border rounded px-3 py-2 flex-1"
+                type="time"
+                value={closingHours}
+                required
+                onChange={(e) => {
+                  setClosingHours(e.target.value);
+                }}
+              />
+            </div>
           </div>
 
-          <div className="flex items-center gap-4 mb-3">
-            <label className="w-40 font-medium">Email</label>
-            <input
-              className="border rounded px-3 py-2 flex-1"
-              type="email"
-              value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-              }}
-            />
+          {/* Media */}
+          <div className="flex flex-col w-1/2 mx-auto p-6 bg-white shadow-lg rounded-lg">
+            <p className="font-bold text-lg mb-4">Media</p>
+
+            <div className="flex items-center gap-4 mb-3">
+              <label className="w-40 font-medium">Restaurant Logo</label>
+              <input
+                className="border rounded px-3 py-2 flex-1"
+                type="file"
+                required
+                onChange={(e) => {
+                  setLogo(e.target.files[0]);
+                }}
+              />
+            </div>
+
+            <div className="flex items-center gap-4 mb-3">
+              <label className="w-40 font-medium">Cover Photo</label>
+              <input
+                className="border rounded px-3 py-2 flex-1"
+                type="file"
+                required
+                onChange={(e) => {
+                  setCoverPhoto(e.target.files[0]);
+                }}
+              />
+            </div>
           </div>
-        </div>
-
-        {/* Location */}
-        <div className="flex flex-col w-1/2 mx-auto p-6 bg-white shadow-lg rounded-lg mb-6">
-          <p className="font-bold text-lg mb-4">Location</p>
-
-          <div className="flex items-center gap-4 mb-3">
-            <label className="w-40 font-medium">City</label>
-            <input
-              className="border rounded px-3 py-2 flex-1"
-              type="text"
-              value={city}
-              onChange={(e) => {
-                setCity(e.target.value);
-              }}
-            />
+          {/* Action Buttons */}
+          <div className="flex justify-center gap-6 mt-6">
+            <button
+              className="bg-amber-500 text-white px-6 py-2 rounded-lg font-semibold hover:bg-amber-600 transition"
+              type="submit"
+            >
+              Save Restaurant
+            </button>
+            <button
+              className="bg-gray-400 text-white px-6 py-2 rounded-lg font-semibold hover:bg-gray-500 transition"
+              onClick={() => setCurrentMain(() => Restaurants)}
+            >
+              Cancel
+            </button>
           </div>
-
-          <div className="flex items-center gap-4 mb-3">
-            <label className="w-40 font-medium">Pincode</label>
-            <input
-              className="border rounded px-3 py-2 flex-1"
-              type="text"
-              value={pincode}
-              onChange={(e) => {
-                setPincode(e.target.value);
-              }}
-            />
-          </div>
-        </div>
-
-        {/* Restaurant Details */}
-        <div className="flex flex-col w-1/2 mx-auto p-6 bg-white shadow-lg rounded-lg mb-6">
-          <p className="font-bold text-lg mb-4">Restaurant Details</p>
-
-          <div className="flex items-center gap-4 mb-3">
-            <label className="w-40 font-medium">Restaurant Type</label>
-            <input
-              className="border rounded px-3 py-2 flex-1"
-              type="text"
-              value={restaurantType}
-              onChange={(e) => {
-                setRestaurantType(e.target.value);
-              }}
-            />
-          </div>
-
-          <div className="flex items-center gap-4 mb-3">
-            <label className="w-40 font-medium">Opening Hours</label>
-            <input
-              className="border rounded px-3 py-2 flex-1"
-              type="time"
-              value={openingHours}
-              onChange={(e) => {
-                setOpeningHours(e.target.value);
-              }}
-            />
-          </div>
-
-          <div className="flex items-center gap-4 mb-3">
-            <label className="w-40 font-medium">Closing Hours</label>
-            <input
-              className="border rounded px-3 py-2 flex-1"
-              type="time"
-              value={closingHours}
-              onChange={(e) => {
-                setClosingHours(e.target.value);
-              }}
-            />
-          </div>
-        </div>
-
-        {/* Media */}
-        <div className="flex flex-col w-1/2 mx-auto p-6 bg-white shadow-lg rounded-lg">
-          <p className="font-bold text-lg mb-4">Media</p>
-
-          <div className="flex items-center gap-4 mb-3">
-            <label className="w-40 font-medium">Restaurant Logo</label>
-            <input
-              className="border rounded px-3 py-2 flex-1"
-              type="file"
-              onChange={(e) => {
-                setLogo(e.target.files[0]);
-              }}
-            />
-          </div>
-
-          <div className="flex items-center gap-4 mb-3">
-            <label className="w-40 font-medium">Cover Photo</label>
-            <input
-              className="border rounded px-3 py-2 flex-1"
-              type="file"
-              onChange={(e) => {
-                setCoverPhoto(e.target.files[0]);
-              }}
-            />
-          </div>
-        </div>
-        {/* Action Buttons */}
-        <div className="flex justify-center gap-6 mt-6">
-          <button
-            className="bg-amber-500 text-white px-6 py-2 rounded-lg font-semibold hover:bg-amber-600 transition"
-            onClick={() => {
-              saveRestaurant();
-            }}
-          >
-            Save Restaurant
-          </button>
-          <button
-            className="bg-gray-400 text-white px-6 py-2 rounded-lg font-semibold hover:bg-gray-500 transition"
-            onClick={() => setCurrentMain(() => Restaurants)}
-          >
-            Cancel
-          </button>
-        </div>
+        </form>
       </div>
     );
   };
@@ -269,6 +307,21 @@ const Dishes = ({
         alert("Dish name and price are required");
         return;
       }
+      const uploadToClodinary = async (file) => {
+        const mediaData = new FormData();
+        mediaData.append("file", file);
+        mediaData.append("upload_preset", "resraurant");
+        const res = await fetch(
+          "https://api.cloudinary.com/v1_1/dwmatbjdw/image/upload",
+          {
+            method: "POST",
+            body: mediaData,
+          }
+        );
+        const data = await res.json();
+        return data.secure_url;
+      };
+      const imgUrl = await uploadToClodinary(image);
       const response = await fetch(
         `http://localhost:5000/api/restaurant/${selectedRestaurant._id}/addDish`,
         {
@@ -279,7 +332,7 @@ const Dishes = ({
             price: Number(price),
             description,
             category,
-            image,
+            image: imgUrl,
           }),
         }
       );

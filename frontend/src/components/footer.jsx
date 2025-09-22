@@ -1,6 +1,6 @@
 const Footer = () => {
   return (
-    <div className="flex bg-amber-50 justify-around">
+    <div className="flex bg-amber-50 justify-around absolute bottom-0 w-full">
       <div className="footer-section">
         <h2 className="">Food & Bar</h2>
         <p>Delicious food & premium drinks served fresh.</p>

@@ -48,8 +48,8 @@ const restaurantSchema = new mongoose.Schema({
   openingHours: { type: String, required: true },
   closingHours: { type: String, required: true },
   media: {
-    logo: { type: String },
-    coverPhoto: { type: String },
+    logo: { type: String, required: true },
+    coverPhoto: { type: String, required: true },
   },
   categories: [categorySchema], // <-- empty array by default
   createdAt: { type: Date, default: Date.now },
