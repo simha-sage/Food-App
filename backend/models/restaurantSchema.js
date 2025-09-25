@@ -30,6 +30,11 @@ const categorySchema = new mongoose.Schema({
 const restaurantSchema = new mongoose.Schema({
   name: { type: String, required: true, trim: true },
   ownerName: { type: String, required: true, trim: true },
+  ownerId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Seller",
+    required: true,
+  },
   phoneNumber: { type: String, required: true, match: /^[0-9]{10}$/ },
   email: {
     type: String,

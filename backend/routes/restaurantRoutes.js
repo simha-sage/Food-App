@@ -10,6 +10,7 @@ router.post("/create", async (req, res) => {
     const {
       name,
       ownerName,
+      ownerId,
       phoneNumber,
       email,
       location,
@@ -24,6 +25,7 @@ router.post("/create", async (req, res) => {
     const newRestaurant = new Restaurant({
       name,
       ownerName,
+      ownerId,
       phoneNumber,
       email,
       location,
@@ -110,6 +112,21 @@ router.post("/:restaurantId/addDish", async (req, res) => {
 router.get("/all", async (req, res) => {
   try {
     const restaurants = await Restaurant.find(); // fetch all restaurants
+    res.status(200).json({
+      success: true,
+      count: restaurants.length,
+      data: restaurants,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Server Error", error });
+  }
+});
+
+router.get("/:sellerId", async (req, res) => {
+  try {
+    const { sellerId } = req.params;
+    const restaurants = await Restaurant.find({ ownerId: sellerId }); // fetch seller restaurants
     res.status(200).json({
       success: true,
       count: restaurants.length,
