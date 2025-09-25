@@ -17,9 +17,7 @@ export const SwiggyProvider = ({ children }) => {
         if (!seller || !seller._id || seller === null) {
           return;
         }
-        const res = await fetch(
-          `http://localhost:5000/api/restaurant/${seller._id}`
-        ); // backend URL
+        const res = await fetch(`${apiUrl}/api/restaurant/${seller._id}`); // backend URL
         const data = await res.json();
         if (data.success) {
           setSellerRestaurants(data.data);
@@ -39,7 +37,7 @@ export const SwiggyProvider = ({ children }) => {
   useEffect(() => {
     const fetchRestaurants = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/restaurant/all"); // backend URL
+        const res = await fetch(`${apiUrl}/api/restaurant/all`); // backend URL
         const data = await res.json();
         if (data.success) {
           setRestaurants(data.data);
