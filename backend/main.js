@@ -4,7 +4,8 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
 import restaurantRoutes from "./routes/restaurantRoutes.js";
-import authenticationRoutes from "./routes/authentication.js";
+import userAuthRoutes from "./routes/userAuthRoutes.js";
+import sellerAuthRoutes from "./routes/sellerAuthRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
 
 dotenv.config();
@@ -18,7 +19,8 @@ app.use(express.json()); // Parse JSON body
 
 // Routes
 app.use("/api/restaurant", restaurantRoutes);
-app.use("/api/auth", authenticationRoutes);
+app.use("/api/auth", userAuthRoutes);
+app.use("/api/auth", sellerAuthRoutes);
 app.use("/api/cart", cartRoutes);
 
 // Root endpoint

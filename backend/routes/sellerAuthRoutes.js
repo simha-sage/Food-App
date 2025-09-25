@@ -1,12 +1,12 @@
 import express from "express";
-import User from "../models/authenticatonSchema.js";
+import Seller from "../models/sellerAuthSchema.js";
 const router = express.Router();
-router.post("/userSignUp", async (req, res) => {
+router.post("/sellerSignUp", async (req, res) => {
   try {
     const { email, password, userName } = req.body;
-    const newUser = new User({ email, password, name: userName });
-    await newUser.save();
-    res.send({ message: "User added sucessfully" });
+    const newSeller = new Seller({ email, password, name: userName });
+    await newSeller.save();
+    res.send({ message: "Seller added sucessfully" });
   } catch (error) {
     console.error(error);
     if (error.name === "ValidationError") {
@@ -17,13 +17,13 @@ router.post("/userSignUp", async (req, res) => {
   }
 });
 
-router.post("/userSignIn", async (req, res) => {
+router.post("/sellerSignIn", async (req, res) => {
   const { email, password } = req.body;
-  const user = await User.findOne({ email });
-  if (!user || user.password !== password) {
+  const seller = await Seller.findOne({ email });
+  if (!seller || seller.password !== password) {
     return res.send({ message: "Unsucessful" });
   }
-  res.json({ message: "Login successful", data: user });
+  res.send({ message: "Login successful", data: seller });
 });
 
 export default router;

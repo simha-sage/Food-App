@@ -1,132 +1,202 @@
 import React, { useState } from "react";
+import { Eye, EyeOff } from "lucide-react"; // ✅ password toggle icons
+import { useNavigate } from "react-router-dom";
+
+// 🔑 Reusable Password Input
+const PasswordInput = ({ value, onChange, placeholder = "Enter password" }) => {
+  const [showPassword, setShowPassword] = useState(false);
+
+  return (
+    <div className="relative w-full mb-3">
+      <input
+        type={showPassword ? "text" : "password"}
+        placeholder={placeholder}
+        required
+        value={value}
+        onChange={onChange}
+        minLength="6"
+        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+      />
+      <button
+        type="button"
+        className="absolute inset-y-0 right-3 flex items-center text-gray-600 hover:text-gray-800"
+        onClick={() => setShowPassword(!showPassword)}
+      >
+        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+      </button>
+    </div>
+  );
+};
+
+// ✅ Sign In
 const SignIn = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSignIn = async (e) => {
-    const response = await fetch("http://localhost:5000/sellerSignIn", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
+  const handleSignIn = async () => {
+    const response = await fetch(
+      "http://localhost:5000/api/auth/sellerSignIn",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      }
+    );
     const data = await response.json();
-    console.log(data.message);
-    if (data.message == "Login successful") {
+    if (data.message === "Login successful") {
       setEmail("");
       setPassword("");
       window.alert("Login successful");
+      navigate("/adminDashboard");
     } else {
-      window.alert("Login Unsucessful");
+      window.alert("Login Unsuccessful");
     }
   };
+
   return (
     <form
-      id="signIn"
       onSubmit={(e) => {
         e.preventDefault();
         handleSignIn();
       }}
+      className="bg-white shadow-md rounded-xl p-6 w-96 mx-auto"
     >
-      <p>Seller Login Form</p>
+      <p className="text-xl font-bold text-gray-800 mb-4 text-center">
+        Seller Login
+      </p>
       <input
         type="email"
-        placeholder="enter email"
+        placeholder="Enter email"
         value={email}
         required
         maxLength={100}
         onChange={(e) => setEmail(e.target.value)}
+        className="w-full mb-3 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
       />
-      <input
-        type="password"
-        placeholder="password"
+      <PasswordInput
         value={password}
-        required
-        minLength={6}
-        maxLength={100}
         onChange={(e) => setPassword(e.target.value)}
       />
-      <input type="submit" />
+      <input
+        type="submit"
+        value="Login"
+        className="w-full bg-green-600 text-white py-2 rounded-lg font-semibold hover:bg-green-700 cursor-pointer transition"
+      />
     </form>
   );
 };
 
-const SignUp = () => {
+// ✅ Sign Up
+const SignUp = ({ setIsSignIn }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const handleSignUp = async (e) => {
-    const response = await fetch("http://localhost:5000/sellerSignUp", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
-    const data = await response.json();
-    console.log(data.message);
+  const [name, setName] = useState("");
 
+  const handleSignUp = async () => {
+    const response = await fetch(
+      "http://localhost:5000/api/auth/sellerSignUp",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }), // include name
+      }
+    );
+    const data = await response.json();
+    setName("");
     setEmail("");
     setPassword("");
+    setIsSignIn(true);
     window.alert(data.message);
   };
+
   return (
     <form
-      id="signUp"
       onSubmit={(e) => {
         e.preventDefault();
         handleSignUp();
       }}
+      className="bg-white shadow-md rounded-xl p-6 w-96 mx-auto"
     >
-      <p>Seller Regiteration Form</p>
+      <p className="text-xl font-bold text-gray-800 mb-4 text-center">
+        Seller Registration
+      </p>
+      <input
+        type="text"
+        placeholder="Enter name"
+        value={name}
+        required
+        maxLength={100}
+        onChange={(e) => setName(e.target.value)}
+        className="w-full mb-3 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+      />
       <input
         type="email"
-        placeholder="enter email"
+        placeholder="Enter email"
         value={email}
         required
         maxLength={100}
         onChange={(e) => setEmail(e.target.value)}
+        className="w-full mb-3 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
       />
-      <input
-        type="password"
-        placeholder="password"
+      {/* 🔑 Using PasswordInput instead of plain <input /> */}
+      <PasswordInput
         value={password}
-        required
-        maxLength={100}
-        minLength={6}
         onChange={(e) => setPassword(e.target.value)}
       />
-      <input type="submit" />
+      <input
+        type="submit"
+        value="Register"
+        className="w-full bg-green-600 text-white py-2 rounded-lg font-semibold hover:bg-green-700 cursor-pointer transition"
+      />
     </form>
   );
 };
 
+// Toggle Buttons
 const SignUpButton = ({ onClick }) => (
-  <div className="boxButton">
-    <p>Register now...</p>
-    <input type="button" value="Register" onClick={onClick} />
+  <div className="text-center mt-4">
+    <p className="text-gray-600 mb-2">New here?</p>
+    <button
+      onClick={onClick}
+      className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+    >
+      Register
+    </button>
   </div>
 );
+
 const SignInButton = ({ onClick }) => (
-  <div className="boxButton">
-    <p>Good to see you!</p>
-    <input type="button" value="Login" onClick={onClick} />
+  <div className="text-center mt-4">
+    <p className="text-gray-600 mb-2">Already have an account?</p>
+    <button
+      onClick={onClick}
+      className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+    >
+      Login
+    </button>
   </div>
 );
+
+// ✅ Main Toggle
 const SellerAuthToggle = () => {
   const [isSignIn, setIsSignIn] = useState(true);
+
   return (
-    <>
-      <div id="login_toggle">
-        {isSignIn ? (
-          <>
-            <SignIn />
-            <SignUpButton onClick={() => setIsSignIn(false)} />
-          </>
-        ) : (
-          <>
-            <SignInButton onClick={() => setIsSignIn(true)} />
-            <SignUp />
-          </>
-        )}
-      </div>
-    </>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      {isSignIn ? (
+        <div>
+          <SignIn />
+          <SignUpButton onClick={() => setIsSignIn(false)} />
+        </div>
+      ) : (
+        <div>
+          <SignUp setIsSignIn={setIsSignIn} />
+          <SignInButton onClick={() => setIsSignIn(true)} />
+        </div>
+      )}
+    </div>
   );
 };
+
 export default SellerAuthToggle;
