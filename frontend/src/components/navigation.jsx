@@ -42,12 +42,9 @@ const Navigation = () => {
         </div>
 
         <div>
-          <Link
-            to="/userAuthToggle"
-            className="text-gray-700 font-medium hover:text-orange-500 transition"
-          >
+          <h1 className="text-gray-700 font-medium hover:text-orange-500 transition">
             {user.name || "Sign In"}
-          </Link>
+          </h1>
         </div>
       </div>
     </div>

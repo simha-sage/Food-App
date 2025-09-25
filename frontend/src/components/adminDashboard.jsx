@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useSwiggy } from "../context/SwiggyContext";
 import { useNavigate } from "react-router-dom";
+
+const apiUrl = import.meta.env.VITE_API_URL;
 const Restaurants = ({ setCurrentMain, setSelectRestaurant }) => {
   const { sellerRestaurants, setSellerRestaurants, seller } = useSwiggy();
   const AddingForm = () => {
@@ -41,28 +43,25 @@ const Restaurants = ({ setCurrentMain, setSelectRestaurant }) => {
           uploadToClodinary(coverPhoto),
         ]);
 
-        const response = await fetch(
-          "http://localhost:5000/api/restaurant/create",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              name: restaurantName,
-              ownerName,
-              ownerId: seller._id,
-              phoneNumber,
-              email,
-              location: { city, pincode },
-              restaurantType,
-              openingHours,
-              closingHours,
-              media: {
-                logo: logoUrl,
-                coverPhoto: coverPhotoUrl,
-              },
-            }),
-          }
-        );
+        const response = await fetch(`${apiUrl}/api/restaurant/create`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: restaurantName,
+            ownerName,
+            ownerId: seller._id,
+            phoneNumber,
+            email,
+            location: { city, pincode },
+            restaurantType,
+            openingHours,
+            closingHours,
+            media: {
+              logo: logoUrl,
+              coverPhoto: coverPhotoUrl,
+            },
+          }),
+        });
         const data = await response.json();
         if (data.success) {
           alert("restaurant created successfully");
@@ -325,7 +324,7 @@ const Dishes = ({
       };
       const imgUrl = await uploadToClodinary(image);
       const response = await fetch(
-        `http://localhost:5000/api/restaurant/${selectedRestaurant._id}/addDish`,
+        `${apiUrl}/api/restaurant/${selectedRestaurant._id}/addDish`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -437,7 +436,7 @@ const Dishes = ({
   const removeRestaurant = async () => {
     if (confirm(`Do you want remove ${selectedRestaurant.name} `)) {
       await fetch(
-        `http://localhost:5000/api/restaurant/restaurants/${selectedRestaurant._id}`,
+        `${apiUrl}/api/restaurant/restaurants/${selectedRestaurant._id}`,
         {
           method: "DELETE",
         }
@@ -455,7 +454,7 @@ const Dishes = ({
   const removeDish = async (restaurantId, categoryId, dishId) => {
     if (confirm("Are you sure you want to remove this dish?")) {
       const res = await fetch(
-        `http://localhost:5000/api/restaurant/restaurants/${restaurantId}/${categoryId}/${dishId}`,
+        `${apiUrl}/api/restaurant/restaurants/${restaurantId}/${categoryId}/${dishId}`,
         { method: "DELETE" }
       );
 
@@ -633,7 +632,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchRestaurants = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/restaurant/all"); // backend URL
+        const res = await fetch(`${apiUrl}/api/restaurant/all`); // backend URL
         const data = await res.json();
         if (data.success) {
           setRestaurants(data.data);

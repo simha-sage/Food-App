@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Eye, EyeOff, Menu } from "lucide-react"; // ✅ password toggle icons
 import { useNavigate } from "react-router-dom";
 import { useSwiggy } from "../context/SwiggyContext";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 // 🔑 Reusable Password Input
 const PasswordInput = ({ value, onChange, placeholder = "Enter password" }) => {
@@ -37,14 +38,11 @@ const SignIn = () => {
   const { setSeller } = useSwiggy();
 
   const handleSignIn = async () => {
-    const response = await fetch(
-      "http://localhost:5000/api/auth/sellerSignIn",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      }
-    );
+    const response = await fetch(`${apiUrl}/api/auth/sellerSignIn`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
     const data = await response.json();
     if (data.message === "Login successful") {
       setEmail("");
@@ -97,14 +95,11 @@ const SignUp = ({ setIsSignIn }) => {
   const [name, setName] = useState("");
 
   const handleSignUp = async () => {
-    const response = await fetch(
-      "http://localhost:5000/api/auth/sellerSignUp",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }), // include name
-      }
-    );
+    const response = await fetch(`${apiUrl}/api/auth/sellerSignUp`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email, password }), // include name
+    });
     const data = await response.json();
     setName("");
     setEmail("");

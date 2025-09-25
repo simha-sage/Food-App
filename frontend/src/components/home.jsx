@@ -3,7 +3,7 @@ import Footer from "./footer";
 import Navigation from "./navigation";
 import { useSwiggy } from "../context/SwiggyContext";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const RestaCards = ({ setCurrentMain, setSelectRestaurant }) => {
   const { restaurants } = useSwiggy();
@@ -27,26 +27,32 @@ const Home = () => {
   const [selectedRestaurant, setSelectRestaurant] = useState(null);
   const navigate = useNavigate();
   const { user } = useSwiggy();
-  if (!user || !user._id || user === null) {
-    navigate("/userAuthToggle");
 
-    return;
+  // ✅ Redirect safely after render
+  useEffect(() => {
+    if (!user || !user._id) {
+      navigate("/userAuthToggle");
+    }
+  }, [user, navigate]);
+
+  if (!user || !user._id) {
+    // optional: show nothing or a loader while redirecting
+    return null;
   }
 
   return (
-    <>
-      <div className="relative min-h-screen flex flex-col ">
-        <Navigation />
+    <div className="relative min-h-screen flex flex-col">
+      <Navigation />
 
-        <CurrentMain
-          setCurrentMain={setCurrentMain}
-          setSelectRestaurant={setSelectRestaurant}
-          selectedRestaurant={selectedRestaurant}
-        />
+      <CurrentMain
+        setCurrentMain={setCurrentMain}
+        setSelectRestaurant={setSelectRestaurant}
+        selectedRestaurant={selectedRestaurant}
+      />
 
-        <Footer />
-      </div>
-    </>
+      <Footer />
+    </div>
   );
 };
+
 export default Home;
