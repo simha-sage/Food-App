@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useSwiggy } from "../context/SwiggyContext";
+import { useNavigate } from "react-router-dom";
 const Restaurants = ({ setCurrentMain, setSelectRestaurant }) => {
-  const { restaurants, setRestaurants } = useSwiggy();
+  const { sellerRestaurants, setSellerRestaurants, seller } = useSwiggy();
   const AddingForm = () => {
     //basic info
     const [restaurantName, setRestaurantName] = useState("");
@@ -48,6 +49,7 @@ const Restaurants = ({ setCurrentMain, setSelectRestaurant }) => {
             body: JSON.stringify({
               name: restaurantName,
               ownerName,
+              ownerId: seller._id,
               phoneNumber,
               email,
               location: { city, pincode },
@@ -64,7 +66,7 @@ const Restaurants = ({ setCurrentMain, setSelectRestaurant }) => {
         const data = await response.json();
         if (data.success) {
           alert("restaurant created successfully");
-          setRestaurants((prev) => [...prev, data.data]);
+          setSellerRestaurants((prev) => [...prev, data.data]);
           setCurrentMain(() => Restaurants);
         } else {
           alert("failed to create restaurant");
@@ -275,7 +277,7 @@ const Restaurants = ({ setCurrentMain, setSelectRestaurant }) => {
       </div>
 
       <div className="space-y-2">
-        {restaurants.map((data, index) => (
+        {sellerRestaurants.map((data, index) => (
           <p
             key={data._id}
             className="p-3 border rounded-md bg-gray-50 hover:bg-gray-100 transition"
@@ -565,11 +567,25 @@ const Dishes = ({
   );
 };
 const Categories = ({ selectedRestaurant }) => {
+  if (!selectedRestaurant) {
+    return (
+      <div>
+        <p className="font-extrabold text-2xl mb-6">select restaurant</p>
+        <button
+          className="bg-amber-500 px-4 py-2 rounded-2xl"
+          onClick={() => setCurrentMain(() => Restaurants)}
+        >
+          GO
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div>
       <div className="space-y-3">
         {selectedRestaurant.categories.map((category) => (
-          <div key={category.title}>
+          <div key={category._id}>
             <h2 className="font-bold text-lg mb-2">{category.title}</h2>
 
             {category.dishes.map((dish) => (
@@ -611,6 +627,8 @@ const AdminDashboard = () => {
   const [selectedRestaurant, setSelectRestaurant] = useState(null);
   const [restaurants, setRestaurants] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { seller, setSeller } = useSwiggy();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchRestaurants = async () => {
@@ -633,6 +651,11 @@ const AdminDashboard = () => {
   }, []);
 
   if (loading) return <p>Loading restaurants...</p>;
+  if (!seller || !seller._id || seller === null) {
+    navigate("/sellerAuthToggle");
+
+    return;
+  }
   return (
     <div className="flex">
       <div className="fixed top-0 left-0 bg-blue-600 text-white w-2/12 h-screen shadow-lg flex flex-col">
@@ -665,7 +688,11 @@ const AdminDashboard = () => {
         </nav>
 
         <button
-          onClick={() => alert("logout")}
+          onClick={() => {
+            if (window.confirm("Are you sure you want to logout?")) {
+              setSeller(null);
+            }
+          }}
           className="m-6 mt-auto py-2 px-4 bg-amber-500 text-blue-900 font-bold rounded-lg hover:bg-amber-400 transition duration-200"
         >
           Logout

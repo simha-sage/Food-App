@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { Eye, EyeOff } from "lucide-react"; // ✅ password toggle icons
+import { Eye, EyeOff, Menu } from "lucide-react"; // ✅ password toggle icons
 import { useNavigate } from "react-router-dom";
+import { useSwiggy } from "../context/SwiggyContext";
 
 // 🔑 Reusable Password Input
 const PasswordInput = ({ value, onChange, placeholder = "Enter password" }) => {
@@ -33,6 +34,7 @@ const SignIn = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { setSeller } = useSwiggy();
 
   const handleSignIn = async () => {
     const response = await fetch(
@@ -48,6 +50,7 @@ const SignIn = () => {
       setEmail("");
       setPassword("");
       window.alert("Login successful");
+      setSeller(data.data);
       navigate("/adminDashboard");
     } else {
       window.alert("Login Unsuccessful");
@@ -159,7 +162,7 @@ const SignUpButton = ({ onClick }) => (
     <p className="text-gray-600 mb-2">New here?</p>
     <button
       onClick={onClick}
-      className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+      className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
     >
       Register
     </button>
@@ -171,7 +174,7 @@ const SignInButton = ({ onClick }) => (
     <p className="text-gray-600 mb-2">Already have an account?</p>
     <button
       onClick={onClick}
-      className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+      className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
     >
       Login
     </button>
@@ -181,6 +184,8 @@ const SignInButton = ({ onClick }) => (
 // ✅ Main Toggle
 const SellerAuthToggle = () => {
   const [isSignIn, setIsSignIn] = useState(true);
+  const [showMenu, setShowMenu] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -195,6 +200,25 @@ const SellerAuthToggle = () => {
           <SignInButton onClick={() => setIsSignIn(true)} />
         </div>
       )}
+      <div
+        onClick={() => {
+          //navigate("/sellerAuthToggle")
+          setShowMenu(!showMenu);
+        }}
+        className="absolute top-3 right-3  px-4 py-2 bg-white text-orange font-bold rounded-lg shadow-md hover:bg-green-700 transition"
+      >
+        <Menu size={20} />
+        {showMenu && (
+          <div className="absolute top-10 right-0 bg-white border border-gray-300 rounded-lg shadow-lg w-40">
+            <button
+              onClick={() => navigate("/userAuthToggle")}
+              className="w-full text-left px-4 py-2 hover:bg-gray-100 transition rounded-lg font-semibold"
+            >
+              Login as User
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
