@@ -1,8 +1,11 @@
 import { useSwiggy } from "../context/SwiggyContext.jsx";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const Navigation = () => {
-  const { cartItems, user } = useSwiggy();
+  const cartItems = useSelector((state) => state.cart);
+  const { user } = useSwiggy();
+  console.log(cartItems);
   return (
     <div className="flex bg-white shadow-md border-b border-gray-200 h-16 items-center justify-between px-10">
       <div className="flex items-center w-3/12">

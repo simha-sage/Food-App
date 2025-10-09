@@ -1,18 +1,50 @@
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useSwiggy } from "../context/SwiggyContext";
+import { update } from "../redux/cartSlice";
 import Navigation from "./navigation";
 import CountController from "./countController";
 
+const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
 function Cart() {
-  const { cartItems, setCartItems } = useSwiggy();
+  const { user } = useSwiggy();
+  const cartItems = useSelector((state) => state.cart);
+  const dispatch = useDispatch();
+
   let totalcost = 0;
   let deliveryFee = 25.5;
-  cartItems.map((restaurant) => {
-    restaurant.dishes.map((item) => {
+
+  cartItems.forEach((restaurant) => {
+    restaurant.dishes.forEach((item) => {
       totalcost += item.price * item.count;
     });
   });
 
   let gstFee = ((totalcost * 18) % 100.34) + (totalcost * 18) / 100;
+
+  useEffect(() => {
+    if (user && user._id) {
+      const getCart = async () => {
+        try {
+          const res = await fetch(`${apiUrl}/api/cart/${user._id}`, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+          });
+          const data = await res.json();
+          if (data.success) {
+            dispatch(update(data.data.restaurants));
+          } else {
+            console.log("No cart found for user");
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      };
+      getCart();
+    }
+  }, [user]);
 
   return (
     <div>

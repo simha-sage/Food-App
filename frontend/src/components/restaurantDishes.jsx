@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useSwiggy } from "../context/SwiggyContext";
+import { useDispatch } from "react-redux";
+import { update } from "../redux/cartSlice";
 const RestarantDishes = ({ selectedRestaurant }) => {
   const [display, setDisplay] = useState(true);
   return (
@@ -33,52 +35,67 @@ const RestarantDishes = ({ selectedRestaurant }) => {
     </div>
   );
 };
+import { useSelector } from "react-redux";
 const RestaCard = ({ item, selectedRestaurant }) => {
-  const { cartItems, setCartItems } = useSwiggy();
+  const cartItemsRaw = useSelector((state) => state.cart);
+  const [cartItems, setCartItems] = useState(cartItemsRaw);
+  const dispatch = useDispatch();
   const [added, setAdded] = useState(false);
   const addToCart = (item, selectedRestaurant) => {
-    const exitingRestaurantIndex = cartItems.findIndex(
-      (i) => i.restaurantId === selectedRestaurant._id
+    let updatedCartItems = [...cartItems]; // start with a copy
+
+    const exitingRestaurantIndex = updatedCartItems.findIndex(
+      (r) => r.restaurantId === selectedRestaurant._id
     );
+
     if (exitingRestaurantIndex !== -1) {
-      const existingDishIndex = cartItems[
+      const existingDishIndex = updatedCartItems[
         exitingRestaurantIndex
-      ].dishes.findIndex((i) => i._id === item._id);
+      ].dishes.findIndex((d) => d._id === item._id);
+
       if (existingDishIndex !== -1) {
-        const updatedDishes = [...cartItems[exitingRestaurantIndex].dishes];
-        updatedDishes[existingDishIndex].count += 1;
-        const updatedCartItem = {
-          ...cartItems[exitingRestaurantIndex],
+        // create a new dish object instead of mutating
+        const updatedDish = {
+          ...updatedCartItems[exitingRestaurantIndex].dishes[existingDishIndex],
+          count:
+            updatedCartItems[exitingRestaurantIndex].dishes[existingDishIndex]
+              .count + 1,
+        };
+
+        const updatedDishes = [
+          ...updatedCartItems[exitingRestaurantIndex].dishes,
+        ];
+        updatedDishes[existingDishIndex] = updatedDish;
+
+        updatedCartItems[exitingRestaurantIndex] = {
+          ...updatedCartItems[exitingRestaurantIndex],
           dishes: updatedDishes,
         };
-        const updatedCartItems = [...cartItems];
-        updatedCartItems[exitingRestaurantIndex] = updatedCartItem;
-        setCartItems(updatedCartItems);
       } else {
-        const updatedCartItem = {
-          ...cartItems[exitingRestaurantIndex],
+        // add new dish
+        updatedCartItems[exitingRestaurantIndex] = {
+          ...updatedCartItems[exitingRestaurantIndex],
           dishes: [
-            ...cartItems[exitingRestaurantIndex].dishes,
+            ...updatedCartItems[exitingRestaurantIndex].dishes,
             { ...item, count: 1 },
           ],
         };
-        const updatedCartItems = [...cartItems];
-        updatedCartItems[exitingRestaurantIndex] = updatedCartItem;
-        setCartItems(updatedCartItems);
       }
     } else {
-      setCartItems([
-        ...cartItems,
-        {
-          restaurantId: selectedRestaurant._id,
-          restaurantName: selectedRestaurant.name,
-          logo: selectedRestaurant.media.logo,
-          city: selectedRestaurant.location.city,
-          dishes: [{ ...item, count: 1 }],
-        },
-      ]);
+      // add new restaurant
+      updatedCartItems.push({
+        restaurantId: selectedRestaurant._id,
+        restaurantName: selectedRestaurant.name,
+        logo: selectedRestaurant.media.logo,
+        city: selectedRestaurant.location.city,
+        dishes: [{ ...item, count: 1 }],
+      });
     }
+
+    setCartItems(updatedCartItems);
+    dispatch(update(updatedCartItems));
   };
+
   return (
     <div className=" flex justify-between px-3 py-4 border-b">
       <div className="flex flex-col w-5/6">
@@ -88,15 +105,24 @@ const RestaCard = ({ item, selectedRestaurant }) => {
       </div>
       <div className="relative flex flex-col justify-center items-center h-40 w-1/6 ">
         <img src={item.image} className=" relative rounded-2xl h-30 w-40 " />
-        <button
-          className="absolute bottom-0  bg-white-300 rounded bg-white font-bold border text-green-500 px-4 py-2 hover:bg-amber-200"
-          onClick={() => {
-            addToCart(item, selectedRestaurant);
-            setAdded(true);
-          }}
-        >
-          {added ? "✔️" : "Add"}
-        </button>
+        {!added ? (
+          <button
+            className="absolute bottom-0 bg-white font-bold border text-green-500 px-4 py-2 rounded hover:bg-amber-200"
+            onClick={() => {
+              addToCart(item, selectedRestaurant);
+              setAdded(true);
+            }}
+          >
+            Add
+          </button>
+        ) : (
+          <button
+            className="absolute bottom-0 bg-green-500 text-white font-bold border px-4 py-2 rounded hover:bg-green-600"
+            onClick={() => setAdded(false)}
+          >
+            ✔️
+          </button>
+        )}
       </div>
     </div>
   );
