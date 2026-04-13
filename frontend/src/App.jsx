@@ -1,5 +1,5 @@
 import Home from "./components/home";
-import AdminDashboard from "./components/AdminDashboard";
+import AdminDashboard from "./components/adminDashboard";
 import Auth from "./components/Auth";
 import { useSwiggy } from "./context/SwiggyContext";
 
