@@ -1,12 +1,13 @@
 import Card from "./card";
 import Footer from "./footer";
-import Navigation from "./navigation";
+import Navigation from "./Navigation";
+import RestuarantDishes from "./restaurantDishes";
+import Cart from "./cart";
+import About from "./about";
 import { useSwiggy } from "../context/SwiggyContext";
-import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
 
-const RestaCards = ({ setCurrentMain, setSelectRestaurant }) => {
-  const { restaurants } = useSwiggy();
+const HomeContent = () => {
+  const { restaurants, setSelectedRestaurant, setCurrentPage } = useSwiggy();
 
   return (
     <div className="flex flex-wrap justify-start">
@@ -14,8 +15,8 @@ const RestaCards = ({ setCurrentMain, setSelectRestaurant }) => {
         <Card
           key={i}
           item={item}
-          setSelectRestaurant={setSelectRestaurant}
-          setCurrentMain={setCurrentMain}
+          setSelectRestaurant={setSelectedRestaurant}
+          setCurrentPage={setCurrentPage}
         />
       ))}
     </div>
@@ -23,33 +24,25 @@ const RestaCards = ({ setCurrentMain, setSelectRestaurant }) => {
 };
 
 const Home = () => {
-  const [CurrentMain, setCurrentMain] = useState(() => RestaCards);
-  const [selectedRestaurant, setSelectRestaurant] = useState(null);
-  const navigate = useNavigate();
-  const { user } = useSwiggy();
+  const { currentPage } = useSwiggy();
 
-  // ✅ Redirect safely after render
-  useEffect(() => {
-    if (!user || !user._id) {
-      navigate("/userAuthToggle");
+  const renderPage = () => {
+    switch (currentPage) {
+      case "restaurantDishes":
+        return <RestuarantDishes />;
+      case "cart":
+        return <Cart />;
+      case "about":
+        return <About />;
+      default:
+        return <HomeContent />;
     }
-  }, [user, navigate]);
-
-  if (!user || !user._id) {
-    // optional: show nothing or a loader while redirecting
-    return null;
-  }
+  };
 
   return (
     <div className="relative min-h-screen flex flex-col">
       <Navigation />
-
-      <CurrentMain
-        setCurrentMain={setCurrentMain}
-        setSelectRestaurant={setSelectRestaurant}
-        selectedRestaurant={selectedRestaurant}
-      />
-
+      <main className="flex-1">{renderPage()}</main>
       <Footer />
     </div>
   );

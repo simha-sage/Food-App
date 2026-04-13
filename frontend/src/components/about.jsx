@@ -1,9 +1,6 @@
-import Navigation from "./navigation";
-
 export default function About() {
   return (
     <div>
-      <Navigation />
       <div className="bg-gray-50 min-h-screen py-12 px-6 lg:px-20">
         <div className="max-w-5xl mx-auto">
           {/* Title */}

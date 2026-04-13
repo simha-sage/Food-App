@@ -1,5 +1,4 @@
 import { useSwiggy } from "../context/SwiggyContext";
-import Navigation from "./navigation";
 import CountController from "./countController";
 
 function Cart() {
@@ -16,7 +15,6 @@ function Cart() {
 
   return (
     <div>
-      <Navigation />
       <div className="w-1/4 mx-auto text-center">
         <h1 className="font-bold">
           {cartItems.length === 0 ? "cart is empty!" : ""}

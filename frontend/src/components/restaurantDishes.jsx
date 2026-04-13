@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useSwiggy } from "../context/SwiggyContext";
-const RestarantDishes = ({ selectedRestaurant }) => {
+const RestarantDishes = () => {
   const [display, setDisplay] = useState(true);
+  const { selectedRestaurant } = useSwiggy();
   return (
     <div className="mb-10 ">
       {selectedRestaurant.categories.map((item, i) => (
@@ -38,7 +39,7 @@ const RestaCard = ({ item, selectedRestaurant }) => {
   const [added, setAdded] = useState(false);
   const addToCart = (item, selectedRestaurant) => {
     const exitingRestaurantIndex = cartItems.findIndex(
-      (i) => i.restaurantId === selectedRestaurant._id
+      (i) => i.restaurantId === selectedRestaurant._id,
     );
     if (exitingRestaurantIndex !== -1) {
       const existingDishIndex = cartItems[

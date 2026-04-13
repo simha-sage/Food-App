@@ -33,7 +33,7 @@ const Restaurants = ({ setCurrentMain, setSelectRestaurant }) => {
             {
               method: "POST",
               body: mediaData,
-            }
+            },
           );
           const data = await res.json();
           return data.secure_url;
@@ -317,7 +317,7 @@ const Dishes = ({
           {
             method: "POST",
             body: mediaData,
-          }
+          },
         );
         const data = await res.json();
         return data.secure_url;
@@ -335,7 +335,7 @@ const Dishes = ({
             category,
             image: imgUrl,
           }),
-        }
+        },
       );
       const data = await response.json();
 
@@ -439,14 +439,14 @@ const Dishes = ({
         `${apiUrl}/api/restaurant/restaurants/${selectedRestaurant._id}`,
         {
           method: "DELETE",
-        }
+        },
       )
         .then((res) => res.json())
         .then((data) => alert(data.message))
         .then(
           setRestaurants((prev) =>
-            prev.filter((f) => f._id !== selectedRestaurant._id)
-          )
+            prev.filter((f) => f._id !== selectedRestaurant._id),
+          ),
         )
         .then(setCurrentMain(() => Restaurants));
     }
@@ -455,7 +455,7 @@ const Dishes = ({
     if (confirm("Are you sure you want to remove this dish?")) {
       const res = await fetch(
         `${apiUrl}/api/restaurant/restaurants/${restaurantId}/${categoryId}/${dishId}`,
-        { method: "DELETE" }
+        { method: "DELETE" },
       );
 
       const data = await res.json();
@@ -538,7 +538,7 @@ const Dishes = ({
                           removeDish(
                             selectedRestaurant._id,
                             category._id,
-                            dish._id
+                            dish._id,
                           )
                         }
                       >
@@ -627,7 +627,6 @@ const AdminDashboard = () => {
   const [restaurants, setRestaurants] = useState([]);
   const [loading, setLoading] = useState(true);
   const { seller, setSeller } = useSwiggy();
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchRestaurants = async () => {
@@ -651,7 +650,7 @@ const AdminDashboard = () => {
 
   if (loading) return <p>Loading restaurants...</p>;
   if (!seller || !seller._id || seller === null) {
-    navigate("/sellerAuthToggle");
+    // navigate("/sellerAuthToggle");
 
     return;
   }

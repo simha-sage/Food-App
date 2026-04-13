@@ -4,13 +4,17 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
 import restaurantRoutes from "./routes/restaurantRoutes.js";
-import userAuthRoutes from "./routes/userAuthRoutes.js";
-import sellerAuthRoutes from "./routes/sellerAuthRoutes.js";
+import auth from "./routes/auth.js";
+
 import cartRoutes from "./routes/cartRoutes.js";
 
 dotenv.config();
+import cookieParser from "cookie-parser";
 
 const app = express();
+
+app.use(cookieParser());
+
 const PORT = process.env.PORT || 5000;
 
 // Middleware
@@ -19,8 +23,7 @@ app.use(express.json()); // Parse JSON body
 
 // Routes
 app.use("/api/restaurant", restaurantRoutes);
-app.use("/api/auth", userAuthRoutes);
-app.use("/api/auth", sellerAuthRoutes);
+app.use("/api/auth", auth);
 app.use("/api/cart", cartRoutes);
 
 // Root endpoint

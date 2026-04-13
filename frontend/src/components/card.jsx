@@ -1,11 +1,12 @@
 import RestarantDishes from "./restaurantDishes";
-const Card = ({ item, setSelectRestaurant, setCurrentMain }) => {
+const Card = ({ item, setSelectRestaurant, setCurrentPage }) => {
   return (
     <div
       className="bg-[#d9e8f2] hover:bg-[#acc6da] transition-colors duration-200 h-[300px] w-[300px] m-4 p-4 rounded-xl"
       onClick={() => {
         setSelectRestaurant(item);
-        setCurrentMain(() => RestarantDishes);
+        setCurrentPage("restaurantDishes");
+        console.log(item);
       }}
     >
       <div className="h-7/12  rounded-xl">
