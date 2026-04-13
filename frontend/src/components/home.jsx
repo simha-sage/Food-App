@@ -1,6 +1,6 @@
 import Card from "./card";
 import Footer from "./footer";
-import Navigation from "./Navigation";
+import Navigation from "./navigation";
 import RestuarantDishes from "./restaurantDishes";
 import Cart from "./cart";
 import About from "./about";
