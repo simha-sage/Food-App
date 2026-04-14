@@ -1,102 +1,118 @@
 import { useState } from "react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { useSwiggy } from "../context/SwiggyContext";
+
 const RestarantDishes = () => {
-  const [display, setDisplay] = useState(true);
   const { selectedRestaurant } = useSwiggy();
+  const [openCategory, setOpenCategory] = useState(0);
+
   return (
-    <div className="mb-10 ">
-      {selectedRestaurant.categories.map((item, i) => (
-        <div className="w-6/12  mx-auto" key={i}>
-          <h1
-            onClick={() => {
-              setDisplay(!display);
-            }}
-            className=" font-bold text-center font-mono text-grey pt-4 "
+    <div className="max-w-5xl mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold text-zinc-900 mb-8">
+        {selectedRestaurant.name} Menu
+      </h1>
+
+      {selectedRestaurant.categories.map((category, index) => (
+        <div
+          key={index}
+          className="mb-6 rounded-2xl border border-zinc-200 bg-white shadow-sm overflow-hidden"
+        >
+          <button
+            onClick={() =>
+              setOpenCategory(openCategory === index ? null : index)
+            }
+            className="w-full flex items-center justify-between px-6 py-4 bg-zinc-50 hover:bg-zinc-100 transition"
           >
-            ◆ {item.title.toUpperCase()} ◆
-          </h1>
-          {display
-            ? item.dishes.map((dish) => (
+            <span className="font-bold text-lg text-zinc-800">
+              {category.title}
+            </span>
+            {openCategory === index ? (
+              <ChevronUp size={20} />
+            ) : (
+              <ChevronDown size={20} />
+            )}
+          </button>
+
+          {openCategory === index && (
+            <div className="divide-y">
+              {category.dishes.map((dish) => (
                 <RestaCard
                   key={dish._id}
                   item={dish}
                   selectedRestaurant={selectedRestaurant}
                 />
-              ))
-            : null}
+              ))}
+            </div>
+          )}
         </div>
       ))}
-      <div className="h-77">
-        <h1 className="text-center font-bold text-black pt-10">
-          ~ end of menu ~
-        </h1>
-      </div>
+
+      <p className="text-center text-zinc-500 mt-10 text-sm">~ End of menu ~</p>
     </div>
   );
 };
+
 const RestaCard = ({ item, selectedRestaurant }) => {
-  const { cartItems, setCartItems } = useSwiggy();
-  const [added, setAdded] = useState(false);
-  const addToCart = (item, selectedRestaurant) => {
-    const exitingRestaurantIndex = cartItems.findIndex(
-      (i) => i.restaurantId === selectedRestaurant._id,
+  const { cartItems, setCartItems, syncCartToBackend } = useSwiggy();
+
+  const addToCart = async () => {
+    let updatedCartItems = [...cartItems];
+
+    const restaurantIndex = updatedCartItems.findIndex(
+      (r) => r.restaurantId === selectedRestaurant._id,
     );
-    if (exitingRestaurantIndex !== -1) {
-      const existingDishIndex = cartItems[
-        exitingRestaurantIndex
-      ].dishes.findIndex((i) => i._id === item._id);
-      if (existingDishIndex !== -1) {
-        const updatedDishes = [...cartItems[exitingRestaurantIndex].dishes];
-        updatedDishes[existingDishIndex].count += 1;
-        const updatedCartItem = {
-          ...cartItems[exitingRestaurantIndex],
-          dishes: updatedDishes,
-        };
-        const updatedCartItems = [...cartItems];
-        updatedCartItems[exitingRestaurantIndex] = updatedCartItem;
-        setCartItems(updatedCartItems);
+
+    if (restaurantIndex !== -1) {
+      const dishIndex = updatedCartItems[restaurantIndex].dishes.findIndex(
+        (d) => d._id === item._id,
+      );
+
+      if (dishIndex !== -1) {
+        updatedCartItems[restaurantIndex].dishes[dishIndex].count += 1;
       } else {
-        const updatedCartItem = {
-          ...cartItems[exitingRestaurantIndex],
-          dishes: [
-            ...cartItems[exitingRestaurantIndex].dishes,
-            { ...item, count: 1 },
-          ],
-        };
-        const updatedCartItems = [...cartItems];
-        updatedCartItems[exitingRestaurantIndex] = updatedCartItem;
-        setCartItems(updatedCartItems);
+        updatedCartItems[restaurantIndex].dishes.push({
+          ...item,
+          count: 1,
+        });
       }
     } else {
-      setCartItems([
-        ...cartItems,
-        {
-          restaurantId: selectedRestaurant._id,
-          restaurantName: selectedRestaurant.name,
-          logo: selectedRestaurant.media.logo,
-          city: selectedRestaurant.location.city,
-          dishes: [{ ...item, count: 1 }],
-        },
-      ]);
+      updatedCartItems.push({
+        restaurantId: selectedRestaurant._id,
+        restaurantName: selectedRestaurant.name,
+        logo: selectedRestaurant.media.logo,
+        city: selectedRestaurant.location.city,
+        dishes: [{ ...item, count: 1 }],
+      });
     }
+
+    setCartItems(updatedCartItems);
+    await syncCartToBackend(updatedCartItems);
   };
+
   return (
-    <div className=" flex justify-between px-3 py-4 border-b">
-      <div className="flex flex-col w-5/6">
-        <h1 className="font-extrabold">{item.name.toUpperCase()}</h1>
-        <h1>Price: ₹{item.price}</h1>
-        <h1 className="font-extralight">{item.description}</h1>
+    <div className="flex justify-between gap-6 p-6">
+      {/* 🍲 Left content */}
+      <div className="flex-1">
+        <h2 className="font-bold text-lg text-zinc-900">{item.name}</h2>
+        <p className="text-sm text-zinc-600 mt-1">₹{item.price}</p>
+        <p className="text-sm text-zinc-500 mt-2 leading-6">
+          {item.description}
+        </p>
       </div>
-      <div className="relative flex flex-col justify-center items-center h-40 w-1/6 ">
-        <img src={item.image} className=" relative rounded-2xl h-30 w-40 " />
+
+      {/* 🖼 Right image */}
+      <div className="relative w-40 h-32 shrink-0">
+        <img
+          src={item.image}
+          alt={item.name}
+          className="w-full h-full object-cover rounded-2xl shadow-md"
+        />
+
         <button
-          className="absolute bottom-0  bg-white-300 rounded bg-white font-bold border text-green-500 px-4 py-2 hover:bg-amber-200"
-          onClick={() => {
-            addToCart(item, selectedRestaurant);
-            setAdded(true);
-          }}
+          onClick={addToCart}
+          className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-white border border-zinc-200 rounded-xl px-5 py-2 font-bold text-green-600 shadow hover:bg-green-50 transition"
         >
-          {added ? "✔️" : "Add"}
+          Add
         </button>
       </div>
     </div>

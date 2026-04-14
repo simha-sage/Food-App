@@ -654,6 +654,19 @@ const AdminDashboard = () => {
 
     return;
   }
+  const handleLogout = async () => {
+    try {
+      await fetch(`${apiUrl}/api/auth/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
+
+      setSeller(null);
+      setCurrentPage("home");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
   return (
     <div className="flex">
       <div className="fixed top-0 left-0 bg-blue-600 text-white w-2/12 h-screen shadow-lg flex flex-col">
@@ -688,7 +701,7 @@ const AdminDashboard = () => {
         <button
           onClick={() => {
             if (window.confirm("Are you sure you want to logout?")) {
-              setSeller(null);
+              handleLogout();
             }
           }}
           className="m-6 mt-auto py-2 px-4 bg-amber-500 text-blue-900 font-bold rounded-lg hover:bg-amber-400 transition duration-200"
